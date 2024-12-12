@@ -38,11 +38,11 @@ func (u User) Save() error {
 }
 
 func (u User) ValidateCred() error {
-	query := "SELECT password FROM users WHERE email = ?"
+	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.DB.QueryRow(query, u.Email)
 
 	var retrievedPassword string
-	err := row.Scan(&retrievedPassword)
+	err := row.Scan(&u.ID, &retrievedPassword)
 
 	if err != nil {
 		return err
@@ -55,3 +55,13 @@ func (u User) ValidateCred() error {
 	}
 	return nil
 }
+
+// func (u User) GetUserId() error {
+// 	query := "SELECT id FROM users WHERE email = ?"
+
+// 	row := db.DB.QueryRow(query, u.Email)
+// 	err := row.Scan(&u.ID)
+
+// 	return err
+
+// }
