@@ -42,7 +42,7 @@ func createEvent(context *gin.Context) {
 		return
 	}
 
-	userid := context.GetInt64("userid")
+	userid := context.GetInt64("userId")
 	event.UserID = userid
 
 	err = event.Save()
@@ -61,11 +61,18 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEventByID(eventId)
+	userid := context.GetInt64("userId")
+	event, err := models.GetEventByID(eventId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event. Try again later."})
 		return
 	}
+
+	if event.UserID != userid {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch the event."})
+		return
+	}
+
 	var updateEvent models.Event
 	err = context.ShouldBindJSON(&updateEvent)
 	if err != nil {
@@ -89,11 +96,17 @@ func deleteEvent(context *gin.Context) {
 		return
 	}
 
+	userid := context.GetInt64("userId")
 	event, err := models.GetEventByID(eventId)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event. Try again later."})
 		return
 	}
+	if event.UserID != userid {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch the event."})
+		return
+	}
+
 	err = event.Delete()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not delete event."})
