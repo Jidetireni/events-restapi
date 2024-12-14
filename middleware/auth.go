@@ -22,6 +22,6 @@ func Auth(context *gin.Context) {
 		return
 	}
 
-	context.Set("userid", userid)
+	context.Set("userId", userid)
 	context.Next()
 }
